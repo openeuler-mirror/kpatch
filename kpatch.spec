@@ -1,14 +1,12 @@
-%global raw_version 0.9.1
-
 Name:           kpatch
 Epoch:          1
-Version:        %{raw_version}
-Release:        2
+Version:        0.9.1
+Release:        5
 Summary:        A Linux dynamic kernel patching infrastructure
 
 License:        GPLv2
 URL:            https://github.com/dynup/kpatch
-Source0:        https://github.com/dynup/kpatch/archive/%{name}-%{raw_version}.tar.gz
+Source0:        https://github.com/dynup/kpatch/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 Source1:        os_hotpatch
 Source2:        livepatch
@@ -31,14 +29,14 @@ Patch0014:0014-livepatch-patch-hook-support-force-enable-disable.patch
 Patch0015:0015-kpatch-build-ignore-debuginfo-in-patch.patch
 Patch0016:0016-add-object-in-kpatch.patch
 Patch0017:0017-create-diff-object-fix-.orc_unwind_ip-error.patch
-Patch0018:0018-use-orignal-reloc-for-symbols-from-modules.patch
+Patch0018:0018-use-original-reloc-for-symbols-from-modules.patch
 Patch0019:0019-create-diff-object-add-jump-label-support.patch
 Patch0020:0020-kpatch-build-add-compile-flag-fno-reorder-functions.patch
 Patch0021:0021-kpatch-build-don-t-copy-.config-for-out-of-tree-modu.patch
 Patch0022:0022-support-force-enable-disable-for-x86.patch
 Patch0023:0023-create-diff-object-fix-duplicate-symbols-for-vmlinux.patch
 
-BuildRequires:  gcc elfutils-libelf-devel uname-build-checks kernel kernel-devel git
+BuildRequires:  gcc elfutils-libelf-devel uname-build-checks kernel-devel git
 Requires:       bc
 
 %description
@@ -58,7 +56,7 @@ Dynamic kernel patching
 %package_help
 
 %prep
-%autosetup -n %{name}-%{raw_version} -p1 -Sgit
+%autosetup -n %{name}-%{version} -p1 -Sgit
 
 %build
 export CFLAGS="$RPM_OPT_FLAGS" LDFLAGS="$RPM_LD_FLAGS"
@@ -95,6 +93,24 @@ popd
 %{_mandir}/man1/*.1.gz
 
 %changelog
+* Fri Sep 25 2020 Zhipeng Xie<xiezhipeng1@huawei.com> -1:0.9.1-5
+- Type:enhancement
+- ID:NA
+- SUG:NA
+- DESC:update Source0
+
+* Sat Sep 12 2020 Zhipeng Xie<xiezhipeng1@huawei.com> -1:0.9.1-4
+- Type:enhancement
+- ID:NA
+- SUG:NA
+- DESC:code optimization
+
+* Sat Aug 29 2020 Yeqing Peng<pengyeqing@huawei.com> -1:0.9.1-3
+- Type:bugfix
+- ID:NA
+- SUG:NA
+- DESC:adapt kernel source path and name
+
 * Wed Apr 22 2020 Zhipeng Xie<xiezhipeng1@huawei.com> -1:0.9.1-2
 - Type:bugfix
 - ID:NA
