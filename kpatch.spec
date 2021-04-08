@@ -1,7 +1,7 @@
 Name:           kpatch
 Epoch:          1
 Version:        0.9.1
-Release:        6
+Release:        12
 Summary:        A Linux dynamic kernel patching infrastructure
 
 License:        GPLv2
@@ -35,9 +35,12 @@ Patch0020:0020-kpatch-build-add-compile-flag-fno-reorder-functions.patch
 Patch0021:0021-kpatch-build-don-t-copy-.config-for-out-of-tree-modu.patch
 Patch0022:0022-support-force-enable-disable-for-x86.patch
 Patch0023:0023-create-diff-object-fix-duplicate-symbols-for-vmlinux.patch
+Patch0024:0024-optimize-for-out-of-tree-module.patch
+Patch0025:0025-Fix-relocation-not-resolved-when-new-functions-expor.patch
+Patch0026:0026-support-remove-static-variables-using-KPATCH_IGNORE_.patch
 
 BuildRequires:  gcc elfutils-libelf-devel uname-build-checks kernel-devel git
-Requires:       bc
+Requires:       bc make gcc patch bison flex openssl-devel
 Recommends:     %{name}-help = %{version}-%{release}
 
 %description
@@ -94,7 +97,43 @@ popd
 %{_mandir}/man1/*.1.gz
 
 %changelog
-* Thu Nov 22 2020 Zhipeng Xie<xiezhipeng1@huawei.com> -1:0.9.1-6
+* Wed Feb 10 2021 Zhipeng Xie<xiezhipeng1@huawei.com> -1:0.9.1-12
+- Type:enhancement
+- ID:NA
+- SUG:NA
+- DESC:modify hotpatch id length limit from 20 to 32
+
+* Mon Jan 11 2021 Zhipeng Xie<xiezhipeng1@huawei.com> -1:0.9.1-11
+- Type:enhancement
+- ID:NA
+- SUG:NA
+- DESC:add kpatch requires
+
+* Tue Jan 5 2021 Zhipeng Xie<xiezhipeng1@huawei.com> -1:0.9.1-10
+- Type:enhancement
+- ID:NA
+- SUG:NA
+- DESC:only skip gcc check in cross compile environment
+
+* Thu Dec 31 2020 Zhipeng Xie<xiezhipeng1@huawei.com> -1:0.9.1-9
+- Type:enhancement
+- ID:NA
+- SUG:NA
+- DESC:support remove static variables using KPATCH_IGNORE_STATIC
+
+* Sun Nov 22 2020 Zhipeng Xie<xiezhipeng1@huawei.com> -1:0.9.1-8
+- Type:bugfix
+- ID:NA
+- SUG:NA
+- DESC:Fix relocation not resolved when new functions exported only
+
+* Tue Nov 17 2020 Zhipeng Xie<xiezhipeng1@huawei.com> -1:0.9.1-7
+- Type:enhancement
+- ID:NA
+- SUG:NA
+- DESC:optimize for out of tree module
+
+* Thu Nov 12 2020 Zhipeng Xie<xiezhipeng1@huawei.com> -1:0.9.1-6
 - Type:enhancement
 - ID:NA
 - SUG:NA
@@ -185,7 +224,7 @@ popd
 - SUG:restart
 - DESC:add security compile flags
 
-* Tue Sep 27 2019 Zhipeng Xie<xiezhipeng1@huawei.com> - 2.0-3.1.17
+* Fri Sep 27 2019 Zhipeng Xie<xiezhipeng1@huawei.com> - 2.0-3.1.17
 - Type:enhancement
 - ID:NA
 - SUG:restart
@@ -209,7 +248,7 @@ popd
 - SUG:NA
 - DESC:rewrite spec
 
-* Fri Jul 16 2019 yangbin<robin.yb@huawei.com> - 2.0-3.1.13
+* Tue Jul 16 2019 yangbin<robin.yb@huawei.com> - 2.0-3.1.13
 - Type:enhancement
 - ID:NA
 - SUG:restart
