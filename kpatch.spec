@@ -1,7 +1,7 @@
 Name:           kpatch
 Epoch:          1
 Version:        0.9.1
-Release:        6
+Release:        7
 Summary:        A Linux dynamic kernel patching infrastructure
 
 License:        GPLv2
@@ -67,6 +67,7 @@ export CFLAGS="$RPM_OPT_FLAGS" LDFLAGS="$RPM_LD_FLAGS"
 %make_install PREFIX=%{_prefix}
 
 install -Dm 0500 -t %{buildroot}/%{_bindir} %{SOURCE1} %{SOURCE2}
+mkdir -p %{buildroot}/opt/patch_workspace
 install -Dm 0500 -t %{buildroot}/opt/patch_workspace/ %{SOURCE3}
 pushd %{buildroot}/opt/patch_workspace
 mkdir hotpatch package
@@ -94,6 +95,12 @@ popd
 %{_mandir}/man1/*.1.gz
 
 %changelog
+* Fri May 28 2021 Xinpeng Liu<liuxp11@chinatelecom.cn> -1:0.9.1-7
+- Type:enhancement
+- ID:NA
+- SUG:NA
+- DESC:modify the code stype in make_hotpatch and fix compile bug
+
 * Thu Nov 22 2020 Zhipeng Xie<xiezhipeng1@huawei.com> -1:0.9.1-6
 - Type:enhancement
 - ID:NA
