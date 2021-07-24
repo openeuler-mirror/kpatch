@@ -1,7 +1,7 @@
 Name:           kpatch
 Epoch:          1
 Version:        0.9.1
-Release:        12
+Release:        15
 Summary:        A Linux dynamic kernel patching infrastructure
 
 License:        GPLv2
@@ -38,6 +38,8 @@ Patch0023:0023-create-diff-object-fix-duplicate-symbols-for-vmlinux.patch
 Patch0024:0024-optimize-for-out-of-tree-module.patch
 Patch0025:0025-Fix-relocation-not-resolved-when-new-functions-expor.patch
 Patch0026:0026-support-remove-static-variables-using-KPATCH_IGNORE_.patch
+Patch0027:0027-create-build-diff-support-for-.cold-functions-with-n.patch
+Patch0028:0028-lookup-Add-__UNIQUE_ID_-to-maybe_discarded_sym-list.patch
 
 BuildRequires:  gcc elfutils-libelf-devel uname-build-checks kernel-devel git
 Requires:       bc make gcc patch bison flex openssl-devel
@@ -70,6 +72,7 @@ export CFLAGS="$RPM_OPT_FLAGS" LDFLAGS="$RPM_LD_FLAGS"
 %make_install PREFIX=%{_prefix}
 
 install -Dm 0500 -t %{buildroot}/%{_bindir} %{SOURCE1} %{SOURCE2}
+mkdir -p %{buildroot}/opt/patch_workspace
 install -Dm 0500 -t %{buildroot}/opt/patch_workspace/ %{SOURCE3}
 pushd %{buildroot}/opt/patch_workspace
 mkdir hotpatch package
@@ -97,6 +100,24 @@ popd
 %{_mandir}/man1/*.1.gz
 
 %changelog
+* Fri Jul 23 2021 Xinpeng Liu<liuxp11@chinatelecom.cn> -1:0.9.1-15
+- Type:enhancement
+- ID:NA
+- SUG:NA
+- DESC: lookup: Add __UNIQUE_ID_ to maybe_discarded_sym list
+
+* Mon May 31 2021 Xinpeng Liu<liuxp11@chinatelecom.cn> -1:0.9.1-14
+- Type:enhancement
+- ID:NA
+- SUG:NA
+- DESC:modify the code stype in make_hotpatch and fix compile bug
+
+* Sat May 29 2021 Wentao Fan<fanwentao@huawei.com> -1:0.9.1-13
+- Type:bugfix
+- ID:NA
+- SUG:NA
+- DESC:support for .cold functions with no id suffix
+
 * Wed Feb 10 2021 Zhipeng Xie<xiezhipeng1@huawei.com> -1:0.9.1-12
 - Type:enhancement
 - ID:NA
