@@ -1,0 +1,31 @@
+From 2189dd022cda1973efdc198daa0525cbd2ee5bb2 Mon Sep 17 00:00:00 2001
+From: Zhipeng Xie <xiezhipeng1@huawei.com>
+Date: Fri, 17 Sep 2021 10:22:24 +0800
+Subject: [PATCH 21/24] create-diff-object: fix segment fault when sec2->rela
+ is NULL
+
+when patched section has no rela section, we meet segment fault in
+__kpatch_correlate_section. add sec2->rela check to fix it.
+
+Signed-off-by: Zhipeng Xie <xiezhipeng1@huawei.com>
+Signed-off-by: hubin57 <hubin57@huawei.com>
+---
+ kpatch-build/create-diff-object.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/kpatch-build/create-diff-object.c b/kpatch-build/create-diff-object.c
+index f83000b..aa5c5c4 100644
+--- a/kpatch-build/create-diff-object.c
++++ b/kpatch-build/create-diff-object.c
+@@ -1015,7 +1015,7 @@ static void kpatch_correlate_section(struct section *sec_orig,
+ 		__kpatch_correlate_section(sec_orig->base, sec_patched->base);
+ 		sec_orig = sec_orig->base;
+ 		sec_patched = sec_patched->base;
+-	} else if (sec_orig->rela) {
++	} else if (sec_orig->rela && sec_patched->rela) {
+ 		__kpatch_correlate_section(sec_orig->rela, sec_patched->rela);
+ 	}
+ 
+-- 
+2.23.0
+
