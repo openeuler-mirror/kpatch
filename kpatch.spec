@@ -1,7 +1,7 @@
 Name:           kpatch
 Epoch:          1
 Version:        0.9.5
-Release:        1
+Release:        3
 Summary:        A Linux dynamic kernel patching infrastructure
 
 License:        GPLv2
@@ -37,6 +37,9 @@ Patch0021:0021-create-diff-object-fix-segment-fault-when-sec2-rela-.patch
 Patch0022:0022-use-original-reloc-for-symbols-exported-from-modules.patch
 Patch0023:0023-create-diff-object-create-dynamic-relocs-for-changed.patch
 Patch0024:0024-kpatch-build-support-CROSS_COMPILE.patch
+Patch0025:0025-create-diff-object-update-for-__already_done.patch
+Patch0026:0026-kpatch-build-Add-missing-allocation-failure-checks.patch
+Patch0027:0027-create-diff-object-add-support-for-.retpoline_sites-.patch
 
 BuildRequires:  gcc elfutils-libelf-devel kernel-devel git
 Requires:       bc make gcc patch bison flex openssl-devel
@@ -97,13 +100,62 @@ popd
 %{_mandir}/man1/*.1.gz
 
 %changelog
+* Wed Jan 26 2022 Zhipeng Xie<xiezhipeng1@huawei.com> -1:0.9.5-3
+- Type:enhancement
+- ID:NA
+- SUG:NA
+- DESC:backport upstream patch
+
+* Wed Dec 22 2021 Wentao Fan<fanwentao@huawei.com> -1:0.9.5-2
+- Type:enhancement
+- ID:NA
+- SUG:NA
+- DESC:backport upstream patch
+
 * Sat Nov 13 2021 Zhipeng Xie<xiezhipeng1@huawei.com> -1:0.9.5-1
 - Type:enhancement
 - ID:NA
 - SUG:NA
 - DESC:upgrade to upstream v0.9.5
 
-* Fri Jul 23 2021 Xinpeng Liu<liuxp11@chinatelecom.cn> -1:0.9.1-15
+* Sat Oct 30 2021 Bin Hu<hubin57@huawei.com> -1:0.9.1-21
+- Type:enhancement
+- ID:NA
+- SUG:NA
+- DESC:backport upstream patch
+
+* Tue Oct 26 2021 Zhipeng Xie<xiezhipeng1@huawei.com> -1:0.9.1-20
+- Type:enhancement
+- ID:NA
+- SUG:NA
+- DESC:backport upstream patches
+
+* Tue Oct 26 2021 Zhipeng Xie<xiezhipeng1@huawei.com> -1:0.9.1-19
+- Type:enhancement
+- ID:NA
+- SUG:NA
+- DESC:support make compile environment
+
+* Tue Sep 28 2021 Zhipeng Xie<xiezhipeng1@huawei.com> -1:0.9.1-18
+- Type:bugfix
+- ID:NA
+- SUG:NA
+- DESC:kpatch: update sympos for duplicate symbols in vmlinux
+       create-diff-object: fix segment fault when sec2->rela is NULL
+
+* Tue Sep 28 2021 Bin Hu<hubin57@huawei.com> -1:0.9.1-17
+- Type:bugfix
+- ID:NA
+- SUG:NA
+- DESC:remove uname-build-check from build dependency
+
+* Sat Aug 21 2021 Zhipeng Xie<xiezhipeng1@huawei.com> -1:0.9.1-16
+- Type:enhancement
+- ID:NA
+- SUG:NA
+- DESC:create-diff-object: error on detect new/changed ALTINSTR_ENTRY_CB
+
+* Fri Jul 23 2021 Zhipeng Xie<xiezhipeng1@huawei.com> -1:0.9.1-15
 - Type:enhancement
 - ID:NA
 - SUG:NA
