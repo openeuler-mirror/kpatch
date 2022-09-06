@@ -1,7 +1,7 @@
 Name:           kpatch
 Epoch:          1
 Version:        0.9.5
-Release:        11
+Release:        12
 Summary:        A Linux dynamic kernel patching infrastructure
 
 License:        GPLv2
@@ -54,6 +54,7 @@ Patch0038:0038-kpatch-build-do-not-copy-linux-scripts-when.patch
 Patch0039:0039-create-diff-object-ignore-change-of-certain.patch
 Patch0040:0040-create-diff-object-allow-__jump_table-section.patch
 Patch0041:0041-livepatch-patch-hook-fix-kpatch-build-error-which-do.patch
+Patch0042:0042-kpatch-build-fix-loading-error-in-aarch64.patch
 
 BuildRequires:  gcc elfutils-libelf-devel kernel-devel git
 Requires:       bc make gcc patch bison flex openssl-devel
@@ -114,6 +115,12 @@ popd
 %{_mandir}/man1/*.1.gz
 
 %changelog
+* Tue Sep 6 2022 Tang Bin <tangbin_yewu@cmss.chinamobile.com> -1:0.9.5-12
+- Type:bugfix
+- ID:NA
+- SUG:NA
+- DESC:kpatch-build: fix loading error in aarch64
+
 * Mon Sep 5 2022 Tang Bin <tangbin_yewu@cmss.chinamobile.com> -1:0.9.5-11
 - Type:bugfix
 - ID:NA
