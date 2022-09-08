@@ -1,0 +1,79 @@
+From fd5e883eae4d2187e1c2cd6d66b2cf6376183d0e Mon Sep 17 00:00:00 2001
+From: tangbin <tangbin_yewu@cmss.chinamobile.com>
+Date: Tue, 6 Sep 2022 11:03:02 -0400
+Subject: [PATCH] kpatch-build: fix loading error in aarch64
+
+When using the kernel version 4.19.90-2112.8.0.0131.oe1 in
+openEuler-22.03-LTS-aarch64, there are some errors in dmesg
+as follows:
+
+[ 44.843180 < 38.388618>] klp_30: loading out-of-tree module taints kernel.
+[ 44.843183 < 0.000003>] klp_30: tainting kernel with TAINT_LIVEPATCH
+[ 44.843325 < 0.000142>] klp_30: module verification failed: signature and/or required key missing - t ainting kernel
+[ 44.844007 < 0.000682>] WARNING: CPU: 20 PID: 7708 at kernel/trace/ftrace.c:2040 ftrace_bug+0x74/0x25 8
+[ 44.844009 < 0.000002>] Modules linked in: nft_objref nf_conntrack_tftp tun nft_fib_inet nft_fib_ipv4 nft_fib_ipv6 nft_fib nft_reject_inet nf_reject_ipv4 nf_reject_ipv6 nft_reject nft_ct nf_tables_set nf_tabl es ebtable_nat ebtable_broute bridge stp llc ip6table_nat nf_nat_ipv6 ip6table_mangle ip6table_raw ip6table _security iptable_nat nf_nat_ipv4 nf_nat nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 libcrc32c iptable_mangl e iptable_raw iptable_security rfkill ip_set nfnetlink ebtable_filter ebtables ip6table_filter ip6_tables i ptable_filter ip_tables sunrpc sg vfat fat sch_fq_codel fuse ext4 mbcache jbd2 sr_mod sd_mod cdrom virtio_n et virtio_gpu net_failover virtio_scsi failover aes_ce_blk crypto_simd cryptd aes_ce_cipher ghash_ce sha2_c e sha256_arm64 sha1_ce virtio_pci virtio_mmio virtio_ring virtio dm_mirror dm_region_hash
+[ 44.844035 < 0.000026>] dm_log dm_mod
+[ 44.844040 < 0.000005>] CPU: 20 PID: 7708 Comm: insmod Kdump: loaded Tainted: G OE K 4.19 .90+ #1
+[ 44.844041 < 0.000001>] Hardware name: QEMU KVM Virtual Machine, BIOS 0.0.0 02/06/2015
+[ 44.844043 < 0.000002>] pstate: 60400005 (nZCv daif +PAN -UAO)
+[ 44.844045 < 0.000002>] pc : ftrace_bug+0x74/0x258
+[ 44.844048 < 0.000003>] lr : ftrace_update_code.isra.0+0xe0/0x114
+[ 44.844048 < 0.000000>] sp : ffff00002366fc20
+[ 44.844049 < 0.000001>] x29: ffff00002366fc20 x28: ffff0000093b5d40
+[ 44.844050 < 0.000001>] x27: ffff0000080a2e38 x26: ffff0000093b5000
+[ 44.844051 < 0.000001>] x25: ffff000009070028 x24: 0000000002000000
+[ 44.844053 < 0.000002>] x23: ffff000002270080 x22: ffff000009725000
+[ 44.844054 < 0.000001>] x21: ffff000008df6650 x20: ffff000002250514
+[ 44.844055 < 0.000001>] x19: ffff8000c9990050 x18: 0000000000000000
+[ 44.844056 < 0.000001>] x17: 0000000000000000 x16: 0000000000000000
+[ 44.844057 < 0.000001>] x15: ffff000002250514 x14: ff00000000000000
+[ 44.844058 < 0.000001>] x13: 0000000000000000 x12: 0000000000000000
+[ 44.844059 < 0.000001>] x11: fefefefefefefeff x10: 0000000000000000
+[ 44.844060 < 0.000001>] x9 : 0000000000000000 x8 : ffff8000c9212000
+[ 44.844061 < 0.000001>] x7 : ffff00002366f7f0 x6 : ffff00002366fc08
+[ 44.844062 < 0.000001>] x5 : ffff00002366fc08 x4 : 000000000fffffff
+[ 44.844063 < 0.000001>] x3 : ffff0000093b5d40 x2 : ffff0000093b5000
+[ 44.844064 < 0.000001>] x1 : ffff0000080a2e60 x0 : 00000000ffffffea
+[ 44.844066 < 0.000002>] Call trace:
+[ 44.844068 < 0.000002>] ftrace_bug+0x74/0x258
+[ 44.844069 < 0.000001>] ftrace_update_code.isra.0+0xe0/0x114
+[ 44.844071 < 0.000002>] ftrace_process_locs.isra.0+0x118/0x1f0
+[ 44.844072 < 0.000001>] ftrace_module_init+0x2c/0x34
+[ 44.844078 < 0.000006>] load_module+0x3f4/0x820
+[ 44.844080 < 0.000002>] __se_sys_finit_module+0xb8/0x120
+[ 44.844081 < 0.000001>] __arm64_sys_finit_module+0x28/0x34
+[ 44.844084 < 0.000003>] el0_svc_common+0x118/0x170
+[ 44.844085 < 0.000001>] el0_svc_handler+0x3c/0x80
+[ 44.844088 < 0.000003>] el0_svc+0x8/0x640
+[ 44.844090 < 0.000002>] ---[ end trace dab33fa797cbe7ee ]---
+[ 44.844090 < 0.000000>] ftrace failed to modify
+[ 44.844093 < 0.000003>] [] 0xffff000002250514
+[ 44.844093 < 0.000000>] actual: 1f:20:03:d5
+[ 44.844096 < 0.000003>] Initializing ftrace call sites
+[ 44.844097 < 0.000001>] ftrace record flags: 2000000
+[ 44.844098 < 0.000001>] (0)
+expected tramp: ffff0000080a2e3c
+
+Thus, fix this problem.
+
+Signed-off-by: tangbin <tangbin_yewu@cmss.chinamobile.com>
+---
+ kpatch-build/kpatch-elf.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/kpatch-build/kpatch-elf.c b/kpatch-build/kpatch-elf.c
+index 2df9105..c84d865 100644
+--- a/kpatch-build/kpatch-elf.c
++++ b/kpatch-build/kpatch-elf.c
+@@ -325,7 +325,7 @@ static void kpatch_find_func_profiling_calls(struct kpatch_elf *kelf)
+ 	list_for_each_entry(sym, &kelf->symbols, list) {
+ 		if (sym->type != STT_FUNC || !sym->sec || !sym->sec->rela)
+ 			continue;
+-#if defined(__powerpc64__) || defined(__aarch64__)
++#if defined(__powerpc64__)
+ 		list_for_each_entry(rela, &sym->sec->rela->relas, list) {
+ 			if (!strcmp(rela->sym->name, "_mcount")) {
+ 				sym->has_func_profiling = 1;
+-- 
+2.18.4
+
