@@ -1,7 +1,7 @@
 Name:           kpatch
 Epoch:          1
 Version:        0.9.5
-Release:        14
+Release:        15
 Summary:        A Linux dynamic kernel patching infrastructure
 
 License:        GPLv2
@@ -57,6 +57,8 @@ Patch0041:0041-livepatch-patch-hook-fix-kpatch-build-error-which-do.patch
 Patch0042:0042-kpatch-build-fix-loading-error-in-aarch64.patch
 Patch0043:0043-kpatch-build-Remove-duplicate-functions.patch
 Patch0044:0044-lookup-skip-finding-local-symbols-for-object-with-no.patch
+Patch0045:0045-backport-create-diff-object-add-support-for-.return_sites-sec.patch
+Patch0046:0046-create-diff-object-ignore-entsize-change-of-.return_.patch
 
 BuildRequires:  gcc elfutils-libelf-devel kernel-devel git
 Requires:       bc make gcc patch bison flex openssl-devel
@@ -117,6 +119,12 @@ popd
 %{_mandir}/man1/*.1.gz
 
 %changelog
+* Sun Oct 9 2022 Bin Hu <hubin73@huawei.com> -1:0.9.5-15
+- Type:bugfix
+- ID:NA
+- SUG:NA
+- DESC:create-diff-object: add support for .return_sites section
+
 * Sun Oct 9 2022 Bin Hu <hubin73@huawei.com> -1:0.9.5-14
 - Type:bugfix
 - ID:NA
