@@ -1,7 +1,7 @@
 Name:           kpatch
 Epoch:          1
 Version:        0.9.5
-Release:        6
+Release:        7
 Summary:        A Linux dynamic kernel patching infrastructure
 
 License:        GPLv2
@@ -53,6 +53,12 @@ Patch0037:0037-create-diff-object-skip-creating-.kpatch.arch-sectio.patch
 Patch0038:0038-kpatch-build-do-not-copy-linux-scripts-when.patch
 Patch0039:0039-create-diff-object-ignore-change-of-certain.patch
 Patch0040:0040-create-diff-object-allow-__jump_table-section.patch
+Patch0041:0041-livepatch-patch-hook-fix-kpatch-build-error-which-do.patch
+Patch0042:0042-kpatch-build-fix-loading-error-in-aarch64.patch
+Patch0043:0043-kpatch-build-Remove-duplicate-functions.patch
+Patch0044:0044-lookup-skip-finding-local-symbols-for-object-with-no.patch
+Patch0045:0045-backport-create-diff-object-add-support-for-.return_sites-sec.patch
+Patch0046:0046-create-diff-object-ignore-entsize-change-of-.return_.patch
 
 BuildRequires:  gcc elfutils-libelf-devel kernel-devel git
 Requires:       bc make gcc patch bison flex openssl-devel
@@ -113,6 +119,12 @@ popd
 %{_mandir}/man1/*.1.gz
 
 %changelog
+* Mon Oct 17 2022 Bin Hu<hubin73@huawei.com> -1:0.9.5-7
+- Type:bugfix
+- ID:NA
+- SUG:NA
+- DESC:sync patch from master to openEuler-22.03-LTS-Next
+
 * Mon Jul 11 2022 Bin Hu<hubin73@huawei.com> -1:0.9.5-6
 - Type:bugfix
 - ID:NA
