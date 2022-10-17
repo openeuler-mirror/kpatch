@@ -1,0 +1,43 @@
+From 764baf9f38c15d48a7cacbafcad9b83b7a23d842 Mon Sep 17 00:00:00 2001
+From: hubin <hubin73@huawei.com>
+Date: Thu, 1 Sep 2022 06:13:03 +0800
+Subject: [PATCH] create-diff-object: add support for .return_sites section
+
+Signed-off-by: Jonathan Dobson <jdobson@redhat.com>
+
+Reference:https://github.com/dynup/kpatch/commit/33368a88cdf875b0edd02b0dfd3356a7e93b24db
+Conflict:kpatch-build/create-diff-object.c
+---
+ kpatch-build/create-diff-object.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/kpatch-build/create-diff-object.c b/kpatch-build/create-diff-object.c
+index 58d4763..3c55013 100644
+--- a/kpatch-build/create-diff-object.c
++++ b/kpatch-build/create-diff-object.c
+@@ -2242,6 +2242,11 @@ static int retpoline_sites_group_size(struct kpatch_elf *kelf, int offset)
+ {
+ 	return 4;
+ }
++
++static int return_sites_group_size(struct kpatch_elf *kelf, int offset)
++{
++	return 4;
++}
+ #endif
+ #ifdef __powerpc64__
+ static int fixup_entry_group_size(struct kpatch_elf *kelf, int offset)
+@@ -2362,6 +2367,10 @@ static struct special_section special_sections[] = {
+ 		.name		= ".retpoline_sites",
+ 		.group_size	= retpoline_sites_group_size,
+ 	},
++	{
++		.name		= ".return_sites",
++		.group_size	= return_sites_group_size,
++	},
+ #endif
+ #ifdef __powerpc64__
+ 	{
+-- 
+2.33.0
+
