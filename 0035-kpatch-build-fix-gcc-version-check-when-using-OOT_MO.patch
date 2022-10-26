@@ -1,0 +1,26 @@
+From 3911cf1b0631185f5aafca06610f98bd92f4a9db Mon Sep 17 00:00:00 2001
+From: Bin Hu <hubin73@huawei.com>
+Date: Wed, 26 Oct 2022 17:14:50 +0800
+Subject: [PATCH] kpatch-build: fix gcc version check when using OOT_MODULE
+
+Signed-off-by: Bin Hu <hubin73@huawei.com>
+---
+ kpatch-build/kpatch-build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/kpatch-build/kpatch-build b/kpatch-build/kpatch-build
+index 19002a2..c110556 100755
+--- a/kpatch-build/kpatch-build
++++ b/kpatch-build/kpatch-build
+@@ -229,7 +229,7 @@ gcc_version_check() {
+ 	echo 'void main(void) {}' > "$c"
+ 	out="$(gcc -c -pg -ffunction-sections -o "$o" "$c" 2>&1)"
+ 	gccver="$(gcc_version_from_file "$o")"
+-	if [[ -n "$OOT_MODULE" ]]; then
++	if [[ -n "$OOT_MODULE" && "$OOT_MODULE" != "yes" ]]; then
+ 		kgccver="$(gcc_version_from_file "$OOT_MODULE")"
+ 	else
+ 		kgccver="$(gcc_version_from_file "$VMLINUX")"
+-- 
+2.27.0
+
