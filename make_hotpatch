@@ -19,10 +19,17 @@ G_HOTPATCH_TAR=
 G_DIFFEXT=
 G_JOBS="$(getconf _NPROCESSORS_ONLN)"
 G_PATCH_SRC=
-G_KERNEL_SRC=/opt/patch_workspace/kernel-source
-G_KERNEL_CONFIG=/opt/patch_workspace/.config
-G_HOTPATCH_DIR=/opt/patch_workspace/hotpatch
-G_VMLINUX=/opt/patch_workspace/vmlinux
+if [ -z "$CUSTOM_BUILD_DIR" ];then
+    G_KERNEL_SRC=/opt/patch_workspace/kernel-source
+    G_KERNEL_CONFIG=/opt/patch_workspace/.config
+    G_HOTPATCH_DIR=/opt/patch_workspace/hotpatch
+    G_VMLINUX=/opt/patch_workspace/vmlinux
+else
+    G_KERNEL_SRC="$CUSTOM_BUILD_DIR"/kernel-source
+    G_KERNEL_CONFIG="$CUSTOM_BUILD_DIR"/.config
+    G_HOTPATCH_DIR="$CUSTOM_BUILD_DIR"/hotpatch
+    G_VMLINUX="$CUSTOM_BUILD_DIR"/vmlinux
+fi
 G_PREFIX=klp
 G_TMP_DIR=
 G_PATCHFILE=

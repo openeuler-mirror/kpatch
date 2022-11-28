@@ -1,7 +1,7 @@
 Name:           kpatch
 Epoch:          1
 Version:        0.9.5
-Release:        15
+Release:        16
 Summary:        A Linux dynamic kernel patching infrastructure
 
 License:        GPLv2
@@ -119,6 +119,12 @@ popd
 %{_mandir}/man1/*.1.gz
 
 %changelog
+* Mon Oct 17 2022 lvgenggeng <lvgenggeng@uniontech.com> - 1:0.9.5-16
+- Type:enhancement
+- ID:NA
+- SUG:NA
+- DESC:make_hotpatch: add CUSTOM_BUILD_DIR env
+
 * Sun Oct 9 2022 Bin Hu <hubin73@huawei.com> -1:0.9.5-15
 - Type:bugfix
 - ID:NA
