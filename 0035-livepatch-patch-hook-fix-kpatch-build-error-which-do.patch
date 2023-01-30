@@ -1,0 +1,43 @@
+From f4b25dccaac3540f8826ea637549349c0a156a40 Mon Sep 17 00:00:00 2001
+From: tangbin <tangbin@cmss.chinamobile.com>
+Date: Mon, 5 Sep 2022 12:09:06 -0400
+Subject: [PATCH 35/37] livepatch-patch-hook: fix kpatch-build error which do
+ not support ftrace
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+When using the kernel 5.10.0-60.18.0.50.oe2203 in x86_64, and chose the
+livepatch with ftrace, it will show not support for this feature, which
+is not allowed, the error displays as follows:
+
+In file included from /root/.kpatch/tmp/patch/patch-hook.c:21:
+/root/.kpatch/tmp/patch/livepatch-patch-hook.c: In function ‘patch_init’:
+/root/.kpatch/tmp/patch/livepatch-patch-hook.c:606:8: error: implicit declaration of function ‘klp_register_patch’; did you mean ‘klp_enable_patch’? [-Werror=implicit-function-declaration]
+  606 |  ret = klp_register_patch(lpatch);
+      |        ^~~~~~~~~~~~~~~~~~
+      |        klp_enable_patch
+
+So fix this problem.
+
+Signed-off-by: tangbin <tangbin@cmss.chinamobile.com>
+---
+ kmod/patch/livepatch-patch-hook.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/kmod/patch/livepatch-patch-hook.c b/kmod/patch/livepatch-patch-hook.c
+index b565a6a..5d8780c 100644
+--- a/kmod/patch/livepatch-patch-hook.c
++++ b/kmod/patch/livepatch-patch-hook.c
+@@ -70,6 +70,8 @@
+       RHEL_RELEASE_CODE >= RHEL_RELEASE_VERSION(8, 2)
+ #  define HAVE_SIMPLE_ENABLE
+ # endif
++# elif (defined(CONFIG_LIVEPATCH_FTRACE))
++#  define HAVE_SIMPLE_ENABLE
+ #endif
+ 
+ #ifdef RHEL_RELEASE_CODE
+-- 
+2.33.0
+

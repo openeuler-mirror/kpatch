@@ -1,0 +1,64 @@
+From 5e9f742fae2faef7ce30acd3bcf0f3085f55a0f6 Mon Sep 17 00:00:00 2001
+From: Zhipeng Xie <xiezhipeng1@huawei.com>
+Date: Wed, 26 Feb 2020 21:01:02 -0500
+Subject: [PATCH 13/37] kpatch-build: ignore debuginfo in patch
+
+Just ignore all .debug_* sections
+
+Signed-off-by: Zhipeng Xie <xiezhipeng1@huawei.com>
+---
+ kpatch-build/create-diff-object.c | 18 ++++++++++++++++++
+ kpatch-build/kpatch-build         |  1 +
+ 2 files changed, 19 insertions(+)
+
+diff --git a/kpatch-build/create-diff-object.c b/kpatch-build/create-diff-object.c
+index e11a900..9b966e8 100644
+--- a/kpatch-build/create-diff-object.c
++++ b/kpatch-build/create-diff-object.c
+@@ -2763,6 +2763,23 @@ static void kpatch_include_debug_sections(struct kpatch_elf *kelf)
+ 	}
+ }
+ 
++static void kpatch_ignore_debug_sections(struct kpatch_elf *kelf)
++{
++	struct section *sec;
++
++	/* include all .debug_* sections */
++	list_for_each_entry(sec, &kelf->sections, list) {
++		if (is_debug_section(sec)) {
++			sec->include = 0;
++			sec->status = SAME;
++			if (!is_rela_section(sec)) {
++				sec->secsym->include = 0;
++				sec->secsym->status = SAME;
++			}
++		}
++	}
++}
++
+ static void kpatch_mark_ignored_sections(struct kpatch_elf *kelf)
+ {
+ 	struct section *sec, *strsec, *ignoresec;
+@@ -4054,6 +4071,7 @@ int main(int argc, char *argv[])
+ 	new_globals_exist = kpatch_include_new_globals(kelf_patched);
+ 	kpatch_include_new_static_var(kelf_patched);
+ 	kpatch_include_debug_sections(kelf_patched);
++	kpatch_ignore_debug_sections(kelf_patched);
+ 
+ 	kpatch_process_special_sections(kelf_patched, lookup);
+ 
+diff --git a/kpatch-build/kpatch-build b/kpatch-build/kpatch-build
+index a5324db..84d8592 100755
+--- a/kpatch-build/kpatch-build
++++ b/kpatch-build/kpatch-build
+@@ -1273,6 +1273,7 @@ CROSS_COMPILE="$CROSS_COMPILE"
+ save_env
+ 
+ make "${MAKEVARS[@]}" 2>&1 | logger || die
++strip -g "$TEMPDIR/patch/$MODNAME.ko"
+ 
+ if [[ "$USE_KLP" -eq 1 ]]; then
+ 	if [[ "$USE_KLP_ARCH" -eq 0 ]]; then
+-- 
+2.33.0
+

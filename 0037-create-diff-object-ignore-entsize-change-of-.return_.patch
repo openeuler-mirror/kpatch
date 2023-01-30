@@ -1,0 +1,35 @@
+From 4386311b1342c89a999ec2eb6828c9983ffacb65 Mon Sep 17 00:00:00 2001
+From: hubin <hubin73@huawei.com>
+Date: Sun, 9 Oct 2022 14:33:13 +0800
+Subject: [PATCH 37/37] create-diff-object: ignore entsize change of
+ .return_sites section
+
+If a patch contains newly exported function, kernel Makefile.build
+script will add one ld step when generating object file, which
+causes the entsize of patched object's .return_sites section changed
+to 0, and differs from the original entsize 4.
+
+For this change, currently just ignore it.
+
+Signed-off-by: hubin <hubin73@huawei.com>
+---
+ kpatch-build/create-diff-object.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/kpatch-build/create-diff-object.c b/kpatch-build/create-diff-object.c
+index b0975f7..49ada5f 100644
+--- a/kpatch-build/create-diff-object.c
++++ b/kpatch-build/create-diff-object.c
+@@ -569,7 +569,8 @@ static void kpatch_compare_correlated_section(struct section *sec)
+ 	/* Compare section headers (must match or fatal) */
+ 	if (sec1->sh.sh_type != sec2->sh.sh_type ||
+ 	    sec1->sh.sh_flags != sec2->sh.sh_flags ||
+-	    sec1->sh.sh_entsize != sec2->sh.sh_entsize ||
++	    (sec1->sh.sh_entsize != sec2->sh.sh_entsize &&
++	     strcmp(sec1->name, ".return_sites")) ||
+ 	    (sec1->sh.sh_addralign != sec2->sh.sh_addralign &&
+ 	     !is_text_section(sec1) && strcmp(sec1->name, ".rodata")))
+ 		DIFF_FATAL("%s section header details differ from %s", sec1->name, sec2->name);
+-- 
+2.33.0
+

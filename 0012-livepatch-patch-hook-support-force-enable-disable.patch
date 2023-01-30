@@ -1,0 +1,125 @@
+From 66c81cb4c67b21dea3be2d93edf4273346c880e0 Mon Sep 17 00:00:00 2001
+From: Zhipeng Xie <xiezhipeng1@huawei.com>
+Date: Wed, 26 Feb 2020 20:43:34 -0500
+Subject: [PATCH 12/37] livepatch-patch-hook: support force enable/disable
+
+we use force to indicate function which bypass stack check
+
+Signed-off-by: Zhipeng Xie <xiezhipeng1@huawei.com>
+---
+ kmod/patch/kpatch-patch.h         |  1 +
+ kmod/patch/livepatch-patch-hook.c | 17 +++++++++++++++++
+ kpatch-build/kpatch-build         | 17 +++++++++++++++--
+ 3 files changed, 33 insertions(+), 2 deletions(-)
+
+diff --git a/kmod/patch/kpatch-patch.h b/kmod/patch/kpatch-patch.h
+index 9df7818..6e39364 100644
+--- a/kmod/patch/kpatch-patch.h
++++ b/kmod/patch/kpatch-patch.h
+@@ -64,4 +64,5 @@ struct kpatch_post_unpatch_callback {
+ 	char *objname;
+ };
+ 
++extern unsigned long __kpatch_force_funcs[], __kpatch_force_funcs_end[];
+ #endif /* _KPATCH_PATCH_H_ */
+diff --git a/kmod/patch/livepatch-patch-hook.c b/kmod/patch/livepatch-patch-hook.c
+index b578ef3..71439d9 100644
+--- a/kmod/patch/livepatch-patch-hook.c
++++ b/kmod/patch/livepatch-patch-hook.c
+@@ -432,6 +432,16 @@ extern struct kpatch_patch_func __kpatch_funcs[], __kpatch_funcs_end[];
+ extern struct kpatch_patch_dynrela __kpatch_dynrelas[], __kpatch_dynrelas_end[];
+ #endif
+ 
++static int patch_is_func_forced(unsigned long addr)
++{
++	unsigned long *a;
++
++	for (a = __kpatch_force_funcs; a < __kpatch_force_funcs_end; a++)
++		if (*a == addr)
++			return 1;
++	return 0;
++}
++
+ static int __init patch_init(void)
+ {
+ 	struct kpatch_patch_func *kfunc;
+@@ -520,6 +530,13 @@ static int __init patch_init(void)
+ 			lfunc = &lfuncs[j];
+ 			lfunc->old_name = func->kfunc->name;
+ 			lfunc->new_func = (void *)func->kfunc->new_addr;
++#if defined(__KLP_SUPPORT_FORCE__)
++#ifdef __ALL_FORCE__
++			lfunc->force = 1;
++#else
++			lfunc->force = patch_is_func_forced(func->kfunc->new_addr);
++#endif
++#endif
+ #ifdef HAVE_SYMPOS
+ 			lfunc->old_sympos = func->kfunc->sympos;
+ #else
+diff --git a/kpatch-build/kpatch-build b/kpatch-build/kpatch-build
+index f6855ed..a5324db 100755
+--- a/kpatch-build/kpatch-build
++++ b/kpatch-build/kpatch-build
+@@ -377,7 +377,7 @@ find_special_section_data() {
+ 	# shellcheck disable=SC2086
+ 	SPECIAL_VARS="$("$READELF" -wi "$VMLINUX" |
+ 		gawk --non-decimal-data $AWK_OPTIONS '
+-		BEGIN { a = b = e = f = i = j = o = p = s = 0 }
++		BEGIN { a = b = e = f = i = j = o = p = s = c = d = 0 }
+ 
+ 		# Set state if name matches
+ 		check_a && a == 0 && /DW_AT_name.* alt_instr[[:space:]]*$/ {a = 1; next}
+@@ -389,6 +389,7 @@ find_special_section_data() {
+ 		check_o && o == 0 && /DW_AT_name.* orc_entry[[:space:]]*$/ {o = 1; next}
+ 		check_p && p == 0 && /DW_AT_name.* paravirt_patch_site[[:space:]]*$/ {p = 1; next}
+ 		check_s && s == 0 && /DW_AT_name.* static_call_site[[:space:]]*$/ {s = 1; next}
++		c == 0 && /DW_AT_name.* klp_func[[:space:]]*$/ {c = 1; next}
+ 
+ 		# Reset state unless this abbrev describes the struct size
+ 		a == 1 && !/DW_AT_byte_size/ { a = 0; next }
+@@ -400,6 +401,8 @@ find_special_section_data() {
+ 		o == 1 && !/DW_AT_byte_size/ { o = 0; next }
+ 		p == 1 && !/DW_AT_byte_size/ { p = 0; next }
+ 		s == 1 && !/DW_AT_byte_size/ { s = 0; next }
++		c == 1 && /DW_TAG_structure_type/ { c = 2; next }
++		c == 1 && /DW_AT_name.* force[[:space:]]*$/ {d = 1; next}
+ 
+ 		# Now that we know the size, stop parsing for it
+ 		a == 1 {printf("export ALT_STRUCT_SIZE=%d\n", $4); a = 2}
+@@ -411,6 +414,7 @@ find_special_section_data() {
+ 		o == 1 {printf("export ORC_STRUCT_SIZE=%d\n", $4); o = 2}
+ 		p == 1 {printf("export PARA_STRUCT_SIZE=%d\n", $4); p = 2}
+ 		s == 1 {printf("export STATIC_CALL_STRUCT_SIZE=%d\n", $4); s = 2}
++		d == 1 {printf("export KLP_SUPPORT_FORCE=y\n"); d = 2}
+ 
+ 		# Bail out once we have everything
+ 		(!check_a || a == 2) &&
+@@ -421,7 +425,8 @@ find_special_section_data() {
+ 		(!check_j || j == 2) &&
+ 		(!check_o || o == 2) &&
+ 		(!check_p || p == 2) &&
+-		(!check_s || s == 2) {exit}')"
++		(!check_s || s == 2) &&
++		c == 2 {exit}')"
+ 
+ 	[[ -n "$SPECIAL_VARS" ]] && eval "$SPECIAL_VARS"
+ 
+@@ -1216,6 +1221,14 @@ if [[ -n "$DISABLE_AFTER_LOAD" ]];then
+ 	export KCPPFLAGS="-DDISABLE_AFTER_LOAD $KCPPFLAGS"
+ fi
+ 
++if [[ -n "$NO_STACK_CHECK" ]];then
++	export KCPPFLAGS="-D__ALL_FORCE__ $KCPPFLAGS"
++fi
++
++if [[ -n "$KLP_SUPPORT_FORCE" ]];then
++	export KCPPFLAGS="-D__KLP_SUPPORT_FORCE__ $KCPPFLAGS"
++fi
++
+ save_env
+ 
+ echo "Building patch module: $MODNAME.ko"
+-- 
+2.33.0
+

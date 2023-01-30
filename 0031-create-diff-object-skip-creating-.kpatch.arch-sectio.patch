@@ -1,0 +1,27 @@
+From 9126e10f4998e84f9056b83419f56689c5bcf879 Mon Sep 17 00:00:00 2001
+From: hubin <hubin73@huawei.com>
+Date: Tue, 10 May 2022 15:28:55 +0800
+Subject: [PATCH 31/37] create-diff-object: skip creating .kpatch.arch section
+ for sections with empty secsym
+
+Signed-off-by: hubin <hubin73@huawei.com>
+---
+ kpatch-build/create-diff-object.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/kpatch-build/create-diff-object.c b/kpatch-build/create-diff-object.c
+index 1abf3b8..ecc08e9 100644
+--- a/kpatch-build/create-diff-object.c
++++ b/kpatch-build/create-diff-object.c
+@@ -2990,7 +2990,7 @@ static void kpatch_create_kpatch_arch_section(struct kpatch_elf *kelf, char *obj
+ 			continue;
+ 
+ 		sec = find_section_by_name(&kelf->sections, special->name);
+-		if (!sec)
++		if (!sec || !sec->secsym)
+ 			continue;
+ 
+ 		/* entries[index].sec */
+-- 
+2.33.0
+

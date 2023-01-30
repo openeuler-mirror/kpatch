@@ -1,0 +1,51 @@
+From cb75d02d8b8a773386ef3867457d600752a9ec4b Mon Sep 17 00:00:00 2001
+From: hubin <hubin73@huawei.com>
+Date: Sun, 9 Oct 2022 10:34:52 +0800
+Subject: [PATCH 36/37] lookup: skip finding local symbols for object with no
+ local symbols
+
+Signed-off-by: hubin <hubin73@huawei.com>
+---
+ kpatch-build/lookup.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
+
+diff --git a/kpatch-build/lookup.c b/kpatch-build/lookup.c
+index d3b6ae9..4b1717a 100644
+--- a/kpatch-build/lookup.c
++++ b/kpatch-build/lookup.c
+@@ -166,6 +166,22 @@ static bool locals_match(struct lookup_table *table, int idx,
+ 	return true;
+ }
+ 
++static int count_local_symbol(struct list_head *sym_list)
++{
++	struct symbol *sym;
++	int sym_num = 0;
++
++	list_for_each_entry(sym, sym_list, list) {
++		if (sym->bind != STB_LOCAL)
++			continue;
++		if (sym->type != STT_FUNC && sym->type != STT_OBJECT)
++			continue;
++		sym_num++;
++	}
++
++	return sym_num;
++}
++
+ static void find_local_syms(struct lookup_table *table, struct symbol *file_sym,
+ 		struct list_head *sym_list)
+ {
+@@ -173,6 +189,9 @@ static void find_local_syms(struct lookup_table *table, struct symbol *file_sym,
+ 	struct object_symbol *lookup_table_file_sym = NULL;
+ 	int i;
+ 
++	if (count_local_symbol(sym_list) == 0)
++		return;
++
+ 	for_each_obj_symbol(i, sym, table) {
+ 		if (sym->type != STT_FILE)
+ 			continue;
+-- 
+2.33.0
+
