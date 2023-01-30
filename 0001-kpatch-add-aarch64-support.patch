@@ -1,7 +1,7 @@
-From 821e6cb24778bd063d1e8ad097d4bd4c81973091 Mon Sep 17 00:00:00 2001
+From af8c2cebd046dd3833cba8daac26e4d8109f7ff3 Mon Sep 17 00:00:00 2001
 From: Zhipeng Xie <xiezhipeng1@huawei.com>
 Date: Thu, 20 Dec 2018 04:55:38 +0000
-Subject: [PATCH 01/24] kpatch: add aarch64 support
+Subject: [PATCH 01/37] kpatch: add aarch64 support
 
 1.use R_AARCH64_ABS64 for aarch64
 2.add find_special_section_data_arm64 for arm64:
@@ -10,68 +10,109 @@ in vmlinux, we don't need to check these two struct for arm64.
 
 Signed-off-by: Zhipeng Xie <xiezhipeng1@huawei.com>
 ---
- kpatch-build/Makefile             |  4 +++
- kpatch-build/create-diff-object.c | 14 ++++++----
- kpatch-build/kpatch-build         | 46 +++++++++++++++++++++++++++++++
- kpatch-build/kpatch-elf.c         |  2 +-
- 4 files changed, 60 insertions(+), 6 deletions(-)
+ kpatch-build/Makefile             |  2 +-
+ kpatch-build/create-diff-object.c | 32 ++++++++++++++++++-------------
+ kpatch-build/kpatch-build         |  5 +++++
+ kpatch-build/kpatch-elf.c         |  7 +++++++
+ kpatch-build/kpatch-elf.h         |  1 +
+ 5 files changed, 33 insertions(+), 14 deletions(-)
 
 diff --git a/kpatch-build/Makefile b/kpatch-build/Makefile
-index 50899b6..423c32a 100644
+index bebf3cd..5037677 100644
 --- a/kpatch-build/Makefile
 +++ b/kpatch-build/Makefile
-@@ -14,6 +14,10 @@ ifeq ($(ARCH),x86_64)
- SOURCES += insn/insn.c insn/inat.c
- INSN     = insn/insn.o insn/inat.o
- insn/%.o: CFLAGS := $(filter-out -Wconversion, $(CFLAGS))
-+else ifeq ($(ARCH),aarch64)
-+SOURCES += insn/insn.c insn/inat.c
-+INSN     = insn/insn.o insn/inat.o
-+insn/%.o: CFLAGS := $(filter-out -Wconversion, $(CFLAGS))
- else ifeq ($(ARCH),ppc64le)
- SOURCES += gcc-plugins/ppc64le-plugin.c
- PLUGIN   = gcc-plugins/ppc64le-plugin.so
+@@ -22,7 +22,7 @@ PLUGIN_CFLAGS := $(filter-out -Wconversion, $(CFLAGS))
+ PLUGIN_CFLAGS += -shared -I$(GCC_PLUGINS_DIR)/include \
+ 		   -Igcc-plugins -fPIC -fno-rtti -O2 -Wall
+ endif
+-ifeq ($(filter $(ARCH),s390x x86_64 ppc64le),)
++ifeq ($(filter $(ARCH),s390x x86_64 ppc64le aarch64),)
+ $(error Unsupported architecture ${ARCH}, check https://github.com/dynup/kpatch/#supported-architectures)
+ endif
+ 
 diff --git a/kpatch-build/create-diff-object.c b/kpatch-build/create-diff-object.c
-index 6a4848a..ca55180 100644
+index 3604411..0b0b06b 100644
 --- a/kpatch-build/create-diff-object.c
 +++ b/kpatch-build/create-diff-object.c
-@@ -62,6 +62,8 @@
- 
- #ifdef __powerpc64__
- #define ABSOLUTE_RELA_TYPE R_PPC64_ADDR64
-+#elif __aarch64__
-+#define ABSOLUTE_RELA_TYPE R_AARCH64_ABS64
- #else
- #define ABSOLUTE_RELA_TYPE R_X86_64_64
- #endif
-@@ -1536,7 +1538,7 @@ static void kpatch_replace_sections_syms(struct kpatch_elf *kelf)
- 				continue;
- 			}
- 
--#ifdef __powerpc64__
-+#if defined(__powerpc64__) || defined(__aarch64__)
- 			add_off = 0;
- #else
- 			if (rela->type == R_X86_64_PC32 ||
-@@ -2028,7 +2030,7 @@ static int printk_index_group_size(struct kpatch_elf *kelf, int offset)
- 	return size;
- }
- 
--#ifdef __x86_64__
-+#if defined(__x86_64__) || defined(__aarch64__)
- static int parainstructions_group_size(struct kpatch_elf *kelf, int offset)
- {
- 	static int size = 0;
-@@ -2177,7 +2179,7 @@ static struct special_section special_sections[] = {
+@@ -175,6 +175,8 @@ static bool is_gcc6_localentry_bundled_sym(struct kpatch_elf *kelf,
+ 		return false;
+ 	case S390:
+ 		return false;
++	case ARM64:
++		return false;
+ 	default:
+ 		ERROR("unsupported arch");
+ 	}
+@@ -2186,57 +2188,57 @@ static int fixup_group_size(struct kpatch_elf *kelf, int offset)
+ static struct special_section special_sections[] = {
+ 	{
+ 		.name		= "__bug_table",
+-		.arch		= X86_64 | PPC64 | S390,
++		.arch		= X86_64 | PPC64 | S390 | ARM64,
+ 		.group_size	= bug_table_group_size,
+ 	},
+ 	{
+ 		.name		= ".fixup",
+-		.arch		= X86_64 | PPC64 | S390,
++		.arch		= X86_64 | PPC64 | S390 | ARM64,
+ 		.group_size	= fixup_group_size,
+ 	},
+ 	{
+ 		.name		= "__ex_table", /* must come after .fixup */
+-		.arch		= X86_64 | PPC64 | S390,
++		.arch		= X86_64 | PPC64 | S390 | ARM64,
+ 		.group_size	= ex_table_group_size,
+ 	},
+ 	{
+ 		.name		= "__jump_table",
+-		.arch		= X86_64 | PPC64 | S390,
++		.arch		= X86_64 | PPC64 | S390 | ARM64,
+ 		.group_size	= jump_table_group_size,
+ 	},
+ 	{
  		.name		= ".printk_index",
+-		.arch		= X86_64 | PPC64 | S390,
++		.arch		= X86_64 | PPC64 | S390 | ARM64,
  		.group_size	= printk_index_group_size,
  	},
--#ifdef __x86_64__
-+#if defined(__x86_64__) || defined(__aarch64__)
  	{
  		.name		= ".smp_locks",
+-		.arch		= X86_64,
++		.arch		= X86_64 | ARM64,
  		.group_size	= smp_locks_group_size,
-@@ -2990,7 +2992,9 @@ static int function_ptr_rela(const struct rela *rela)
+ 	},
+ 	{
+ 		.name		= ".parainstructions",
+-		.arch		= X86_64,
++		.arch		= X86_64 | ARM64,
+ 		.group_size	= parainstructions_group_size,
+ 	},
+ 	{
+ 		.name		= ".altinstructions",
+-		.arch		= X86_64 | S390,
++		.arch		= X86_64 | S390 | ARM64,
+ 		.group_size	= altinstructions_group_size,
+ 	},
+ 	{
+ 		.name		= ".static_call_sites",
+-		.arch		= X86_64,
++		.arch		= X86_64 | ARM64,
+ 		.group_size	= static_call_sites_group_size,
+ 	},
+ 	{
+ 		.name		= ".retpoline_sites",
+-		.arch		= X86_64,
++		.arch		= X86_64 | ARM64,
+ 		.group_size	= retpoline_sites_group_size,
+ 	},
+ 	{
+ 		.name		= ".return_sites",
+-		.arch		= X86_64,
++		.arch		= X86_64 | ARM64,
+ 		.group_size	= return_sites_group_size,
+ 	},
+ 	{
+@@ -3097,7 +3099,9 @@ static int function_ptr_rela(const struct rela *rela)
  		rela_toc->addend == (int)rela_toc->sym->sym.st_value &&
  		(rela->type == R_X86_64_32S ||
  		rela->type == R_PPC64_TOC16_HA ||
@@ -81,92 +122,99 @@ index 6a4848a..ca55180 100644
 +		rela->type == R_AARCH64_ADD_ABS_LO12_NC));
  }
  
- static bool need_dynrela(struct lookup_table *table, struct section *sec, const struct rela *rela)
-@@ -3479,7 +3483,7 @@ static void kpatch_create_mcount_sections(struct kpatch_elf *kelf)
- 			rela->type = R_X86_64_PC32;
+ static bool need_dynrela(struct kpatch_elf *kelf, struct lookup_table *table,
+@@ -3570,7 +3574,8 @@ static void kpatch_create_mcount_sections(struct kpatch_elf *kelf)
  		}
  
--#else /* __powerpc64__ */
-+#else /* __powerpc64__ || __aarch64__ */
- {
- 		bool found = false;
+ 		switch(kelf->arch) {
+-		case PPC64: {
++		case PPC64:
++		case ARM64: {
+ 			bool found = false;
  
+ 			list_for_each_entry(rela, &sym->sec->rela->relas, list)
+@@ -3806,6 +3811,7 @@ static void kpatch_find_func_profiling_calls(struct kpatch_elf *kelf)
+ 
+ 		switch(kelf->arch) {
+ 		case PPC64:
++		case ARM64:
+ 			list_for_each_entry(rela, &sym->sec->rela->relas, list) {
+ 				if (!strcmp(rela->sym->name, "_mcount")) {
+ 					sym->has_func_profiling = 1;
 diff --git a/kpatch-build/kpatch-build b/kpatch-build/kpatch-build
-index eedf383..ad3a079 100755
+index 296fa48..73f8976 100755
 --- a/kpatch-build/kpatch-build
 +++ b/kpatch-build/kpatch-build
-@@ -375,12 +375,58 @@ find_special_section_data_ppc64le() {
- 	return
- }
+@@ -354,6 +354,9 @@ find_special_section_data() {
+ 		"s390x")
+ 			check[a]=true					# alt_instr
+ 			;;
++		"aarch64")
++			check[a]=true					# alt_instr
++			;;
+ 	esac
  
-+find_special_section_data_aarch64() {
-+
-+	[[ "$CONFIG_JUMP_LABEL" -eq 0 ]] && AWK_OPTIONS="$AWK_OPTIONS -vskip_j=1"
-+
-+	# If $AWK_OPTIONS are blank gawk would treat "" as a blank script
-+	# shellcheck disable=SC2086
-+	SPECIAL_VARS="$(readelf -wi "$VMLINUX" |
-+		gawk --non-decimal-data $AWK_OPTIONS '
-+		BEGIN { a = b = e = j =  0 }
-+
-+		# Set state if name matches
-+		a == 0 && /DW_AT_name.* alt_instr[[:space:]]*$/ {a = 1; next}
-+		b == 0 && /DW_AT_name.* bug_entry[[:space:]]*$/ {b = 1; next}
-+		e == 0 && /DW_AT_name.* exception_table_entry[[:space:]]*$/ {e = 1; next}
-+		j == 0 && /DW_AT_name.* jump_entry[[:space:]]*$/ {j = 1; next}
-+
-+		# Reset state unless this abbrev describes the struct size
-+		a == 1 && !/DW_AT_byte_size/ { a = 0; next }
-+		b == 1 && !/DW_AT_byte_size/ { b = 0; next }
-+		e == 1 && !/DW_AT_byte_size/ { e = 0; next }
-+		j == 1 && !/DW_AT_byte_size/ { j = 0; next }
-+
-+		# Now that we know the size, stop parsing for it
-+		a == 1 {printf("export ALT_STRUCT_SIZE=%d\n", $4); a = 2}
-+		b == 1 {printf("export BUG_STRUCT_SIZE=%d\n", $4); b = 2}
-+		e == 1 {printf("export EX_STRUCT_SIZE=%d\n", $4); e = 2}
-+		j == 1 {printf("export JUMP_STRUCT_SIZE=%d\n", $4); j = 2}
-+
-+		# Bail out once we have everything
-+		a == 2 && b == 2 && e == 2 && (j == 2 || skip_j) {exit}')"
-+
-+	[[ -n "$SPECIAL_VARS" ]] && eval "$SPECIAL_VARS"
-+
-+	[[ -z "$ALT_STRUCT_SIZE" ]] && die "can't find special struct alt_instr size"
-+	[[ -z "$BUG_STRUCT_SIZE" ]] && die "can't find special struct bug_entry size"
-+	[[ -z "$EX_STRUCT_SIZE" ]]  && die "can't find special struct exception_table_entry size"
-+	[[ -z "$JUMP_STRUCT_SIZE" && "$CONFIG_JUMP_LABEL" -ne 0 ]] && die "can't find special struct jump_entry size"
-+
-+	return
-+}
-+
- find_special_section_data() {
- 	if [[ "$ARCH" = "ppc64le" ]]; then
- 		find_special_section_data_ppc64le
- 		return
- 	fi
+ 	# Kernel CONFIG_ features
+@@ -362,6 +365,8 @@ find_special_section_data() {
+ 	[[ -n "$CONFIG_UNWINDER_ORC" ]] && check[o]=true	# orc_entry
+ 	[[ -n "$CONFIG_PARAVIRT" ]] && check[p]=true		# paravirt_patch_site
  
-+	if [[ "$ARCH" = "aarch64" ]]; then
-+		find_special_section_data_aarch64
-+		return
-+	fi
++	[[ "$ARCH" == "aarch64" ]] && unset check[p]
 +
- 	[[ "$CONFIG_PARAVIRT" -eq 0 ]] && AWK_OPTIONS="-vskip_p=1"
- 	[[ "$CONFIG_UNWINDER_ORC" -eq 0 ]] && AWK_OPTIONS="$AWK_OPTIONS -vskip_o=1"
- 	[[ "$CONFIG_JUMP_LABEL" -eq 0 ]] && AWK_OPTIONS="$AWK_OPTIONS -vskip_j=1"
+ 	local c AWK_OPTIONS
+ 	for c in "${!check[@]}"; do
+ 		AWK_OPTIONS+=" -vcheck_${c}=1"
 diff --git a/kpatch-build/kpatch-elf.c b/kpatch-build/kpatch-elf.c
-index 7e272e2..68d5c86 100644
+index 58dbe1a..069e102 100644
 --- a/kpatch-build/kpatch-elf.c
 +++ b/kpatch-build/kpatch-elf.c
-@@ -325,7 +325,7 @@ static void kpatch_find_func_profiling_calls(struct kpatch_elf *kelf)
- 	list_for_each_entry(sym, &kelf->symbols, list) {
- 		if (sym->type != STT_FUNC || !sym->sec || !sym->sec->rela)
- 			continue;
--#ifdef __powerpc64__
-+#if defined(__powerpc64__) || defined(__aarch64__)
- 		list_for_each_entry(rela, &sym->sec->rela->relas, list) {
- 			if (!strcmp(rela->sym->name, "_mcount")) {
- 				sym->has_func_profiling = 1;
+@@ -142,6 +142,8 @@ unsigned int absolute_rela_type(struct kpatch_elf *kelf)
+ 		return R_X86_64_64;
+ 	case S390:
+ 		return R_390_64;
++	case ARM64:
++		return R_AARCH64_ABS64;
+ 	default:
+ 		ERROR("unsupported arch");
+ 	}
+@@ -206,6 +208,7 @@ long rela_target_offset(struct kpatch_elf *kelf, struct section *relasec,
+ 
+ 	switch(kelf->arch) {
+ 	case PPC64:
++	case ARM64:
+ 		add_off = 0;
+ 		break;
+ 	case X86_64:
+@@ -261,6 +264,7 @@ unsigned int insn_length(struct kpatch_elf *kelf, void *addr)
+ 		return decoded_insn.length;
+ 
+ 	case PPC64:
++	case ARM64:
+ 		return 4;
+ 
+ 	case S390:
+@@ -501,6 +505,9 @@ struct kpatch_elf *kpatch_elf_open(const char *name)
+ 	case EM_S390:
+ 		kelf->arch = S390;
+ 		break;
++	case EM_AARCH64:
++		kelf->arch = ARM64;
++		break;
+ 	default:
+ 		ERROR("Unsupported target architecture");
+ 	}
+diff --git a/kpatch-build/kpatch-elf.h b/kpatch-build/kpatch-elf.h
+index 3bc6e76..d887812 100644
+--- a/kpatch-build/kpatch-elf.h
++++ b/kpatch-build/kpatch-elf.h
+@@ -113,6 +113,7 @@ enum architecture {
+ 	PPC64  = 0x1 << 0,
+ 	X86_64 = 0x1 << 1,
+ 	S390   = 0x1 << 2,
++	ARM64  = 0x1 << 3,
+ };
+ 
+ struct kpatch_elf {
 -- 
-2.23.0
+2.33.0
 

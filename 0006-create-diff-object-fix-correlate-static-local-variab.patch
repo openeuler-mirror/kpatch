@@ -1,7 +1,7 @@
-From 80b74891e1d609d7881f9c9d29fe4828c49e2d83 Mon Sep 17 00:00:00 2001
+From 17cb3696430d9d73c94174006ec9922b2285390b Mon Sep 17 00:00:00 2001
 From: Zhipeng Xie <xiezhipeng1@huawei.com>
 Date: Fri, 2 Nov 2018 17:24:51 +0000
-Subject: [PATCH 06/24] create-diff-object: fix correlate static local
+Subject: [PATCH 06/37] create-diff-object: fix correlate static local
  variables for __param section
 
 kpatch-build correlate fail when no sections reference
@@ -31,10 +31,10 @@ Signed-off-by: Zhipeng Xie <xiezhipeng1@huawei.com>
  1 file changed, 4 insertions(+)
 
 diff --git a/kpatch-build/create-diff-object.c b/kpatch-build/create-diff-object.c
-index 1be4fac..7efe7b4 100644
+index c9ebb05..64b63e3 100644
 --- a/kpatch-build/create-diff-object.c
 +++ b/kpatch-build/create-diff-object.c
-@@ -1277,6 +1277,10 @@ static bool kpatch_is_normal_static_local(struct symbol *sym)
+@@ -1250,6 +1250,10 @@ static bool kpatch_is_normal_static_local(struct symbol *sym)
  	if (is_special_static(sym))
  		return false;
  
@@ -46,5 +46,5 @@ index 1be4fac..7efe7b4 100644
  }
  
 -- 
-2.23.0
+2.33.0
 

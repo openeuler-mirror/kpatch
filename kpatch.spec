@@ -1,7 +1,7 @@
 Name:           kpatch
 Epoch:          1
-Version:        0.9.5
-Release:        16
+Version:        0.9.7
+Release:        1
 Summary:        A Linux dynamic kernel patching infrastructure
 
 License:        GPLv2
@@ -19,46 +19,37 @@ Patch0003:0003-create-diff-object-support-kpatch_line_macro_change_.patch
 Patch0004:0004-create-diff-object-support-skip-check-func-profiling.patch
 Patch0005:0005-create-diff-object-new-static-var-should-be-included.patch
 Patch0006:0006-create-diff-object-fix-correlate-static-local-variab.patch
-Patch0007:0007-fix-rodata.str-problem.patch
-Patch0008:0008-livepatch-patch-hook-support-no-active-after-load.patch
-Patch0009:0009-kpatch-build-enhance-for-out-of-tree-module.patch
-Patch0010:0010-support-c-kernel-module.patch
-Patch0011:0011-symbol-lookup-enhancement.patch
-Patch0012:0012-Add-running-kernel-symbol-table-to-help-symbol-looku.patch
-Patch0013:0013-livepatch-patch-hook-support-force-enable-disable.patch
-Patch0014:0014-kpatch-build-ignore-debuginfo-in-patch.patch
-Patch0015:0015-add-object-in-kpatch.patch
-Patch0016:0016-create-diff-object-fix-.orc_unwind_ip-error.patch
-Patch0017:0017-create-diff-object-add-jump-label-support.patch
-Patch0018:0018-kpatch-build-add-compile-flag-fno-reorder-functions.patch
-Patch0019:0019-Fix-relocation-not-resolved-when-new-functions-expor.patch
-Patch0020:0020-support-remove-static-variables-using-KPATCH_IGNORE_.patch
-Patch0021:0021-create-diff-object-fix-segment-fault-when-sec2-rela-.patch
-Patch0022:0022-use-original-reloc-for-symbols-exported-from-modules.patch
-Patch0023:0023-create-diff-object-create-dynamic-relocs-for-changed.patch
-Patch0024:0024-kpatch-build-support-CROSS_COMPILE.patch
-Patch0025:0025-create-diff-object-update-for-__already_done.patch
-Patch0026:0026-kpatch-build-Add-missing-allocation-failure-checks.patch
-Patch0027:0027-create-diff-object-add-support-for-.retpoline_sites-.patch
-Patch0028:0028-Fix-sym-type-condition-in-locals_match.patch
-Patch0029:0029-livepatch-patch-hook-disable-HAVE_SIMPLE_ENABLE-to-k.patch
-Patch0030:0030-kpatch-build-add-KBUILD_MODPOST_WARN-1-to-avoid-modp.patch
-Patch0031:0031-kpatch-build-update-find_parent_obj-to-avoid-error-t.patch
-Patch0032:0032-create-diff-object-fix-segment-fault-when-using-KPAT.patch
-Patch0033:0033-kpatch-macros-replace-__section-with-__kpatch_sectio.patch
-Patch0034:0034-create-diff-object-ignore-changed-of-section-__patch.patch
-Patch0035:0035-create-diff-object-fix-null-pointer-dereference-in-k.patch
-Patch0036:0036-create-diff-object-ignore-.note.gnu.property-section.patch
-Patch0037:0037-create-diff-object-skip-creating-.kpatch.arch-sectio.patch
-Patch0038:0038-kpatch-build-do-not-copy-linux-scripts-when.patch
-Patch0039:0039-create-diff-object-ignore-change-of-certain.patch
-Patch0040:0040-create-diff-object-allow-__jump_table-section.patch
-Patch0041:0041-livepatch-patch-hook-fix-kpatch-build-error-which-do.patch
-Patch0042:0042-kpatch-build-fix-loading-error-in-aarch64.patch
-Patch0043:0043-kpatch-build-Remove-duplicate-functions.patch
-Patch0044:0044-lookup-skip-finding-local-symbols-for-object-with-no.patch
-Patch0045:0045-backport-create-diff-object-add-support-for-.return_sites-sec.patch
-Patch0046:0046-create-diff-object-ignore-entsize-change-of-.return_.patch
+Patch0007:0007-livepatch-patch-hook-support-no-active-after-load.patch
+Patch0008:0008-kpatch-build-enhance-for-out-of-tree-module.patch
+Patch0009:0009-support-c-kernel-module.patch
+Patch0010:0010-symbol-lookup-enhancement.patch
+Patch0011:0011-Add-running-kernel-symbol-table-to-help-symbol-looku.patch
+Patch0012:0012-livepatch-patch-hook-support-force-enable-disable.patch
+Patch0013:0013-kpatch-build-ignore-debuginfo-in-patch.patch
+Patch0014:0014-add-object-in-kpatch.patch
+Patch0015:0015-create-diff-object-fix-.orc_unwind_ip-error.patch
+Patch0016:0016-create-diff-object-add-jump-label-support.patch
+Patch0017:0017-kpatch-build-add-compile-flag-fno-reorder-functions.patch
+Patch0018:0018-Fix-relocation-not-resolved-when-new-functions-expor.patch
+Patch0019:0019-support-remove-static-variables-using-KPATCH_IGNORE_.patch
+Patch0020:0020-use-original-reloc-for-symbols-exported-from-modules.patch
+Patch0021:0021-create-diff-object-create-dynamic-relocs-for-changed.patch
+Patch0022:0022-kpatch-build-support-CROSS_COMPILE.patch
+Patch0023:0023-livepatch-patch-hook-disable-HAVE_SIMPLE_ENABLE-to-k.patch
+Patch0024:0024-kpatch-build-add-KBUILD_MODPOST_WARN-1-to-avoid-modp.patch
+Patch0025:0025-kpatch-build-update-find_parent_obj-to-avoid-error-t.patch
+Patch0026:0026-create-diff-object-fix-segment-fault-when-using-KPAT.patch
+Patch0027:0027-kpatch-macros-replace-__section-with-__kpatch_sectio.patch
+Patch0028:0028-create-diff-object-ignore-changed-of-section-__patch.patch
+Patch0029:0029-create-diff-object-fix-null-pointer-dereference-in-k.patch
+Patch0030:0030-create-diff-object-ignore-.note.gnu.property-section.patch
+Patch0031:0031-create-diff-object-skip-creating-.kpatch.arch-sectio.patch
+Patch0032:0032-kpatch-build-do-not-copy-linux-scripts-when-building.patch
+Patch0033:0033-create-diff-object-ignore-change-of-certain-special-.patch
+Patch0034:0034-create-diff-object-allow-__jump_table-section-change.patch
+Patch0035:0035-livepatch-patch-hook-fix-kpatch-build-error-which-do.patch
+Patch0036:0036-lookup-skip-finding-local-symbols-for-object-with-no.patch
+Patch0037:0037-create-diff-object-ignore-entsize-change-of-.return_.patch
 
 BuildRequires:  gcc elfutils-libelf-devel kernel-devel git
 Requires:       bc make gcc patch bison flex openssl-devel
@@ -119,6 +110,12 @@ popd
 %{_mandir}/man1/*.1.gz
 
 %changelog
+* Mon Jan 30 2023 Bin Hu <hubin73@huawei.com> -1:0.9.7-1
+- Type:enhancement
+- ID:NA
+- SUG:NA
+- DESC:upgrade kpatch to version 0.9.7
+
 * Mon Oct 17 2022 lvgenggeng <lvgenggeng@uniontech.com> - 1:0.9.5-16
 - Type:enhancement
 - ID:NA

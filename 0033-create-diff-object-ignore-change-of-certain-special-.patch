@@ -1,0 +1,38 @@
+From c7a3d873d6f0655765aee36c76b41c5e54286388 Mon Sep 17 00:00:00 2001
+From: hubin <hubin73@huawei.com>
+Date: Mon, 23 May 2022 17:00:37 +0800
+Subject: [PATCH 33/37] create-diff-object: ignore change of certain special
+ sections
+
+Signed-off-by: hubin <hubin73@huawei.com>
+---
+ kpatch-build/create-diff-object.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/kpatch-build/create-diff-object.c b/kpatch-build/create-diff-object.c
+index ecc08e9..8e73584 100644
+--- a/kpatch-build/create-diff-object.c
++++ b/kpatch-build/create-diff-object.c
+@@ -3117,6 +3117,19 @@ static void kpatch_process_special_sections(struct kpatch_elf *kelf,
+ 		}
+ 	}
+ 
++	list_for_each_entry(sec, &kelf->sections, list) {
++		if (strcmp(sec->name, "__patchable_function_entries") &&
++			strcmp(sec->name, ".note.gnu.property"))
++			continue;
++
++		sec->status = SAME;
++		sec->include = 0;
++		if (sec->rela) {
++			sec->rela->status = SAME;
++			sec->rela->include = 0;
++		}
++	}
++
+ 	kpatch_regenerate_orc_sections(kelf);
+ }
+ 
+-- 
+2.33.0
+

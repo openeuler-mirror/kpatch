@@ -1,0 +1,51 @@
+From 4a0580c4179a3455dd3442a0de0ee9e3f4ce6896 Mon Sep 17 00:00:00 2001
+From: hubin <hubin73@huawei.com>
+Date: Tue, 10 May 2022 15:27:28 +0800
+Subject: [PATCH 24/37] kpatch-build: add KBUILD_MODPOST_WARN=1 to avoid
+ modpost undefined error
+
+Signed-off-by: hubin <hubin73@huawei.com>
+---
+ kpatch-build/kpatch-build | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/kpatch-build/kpatch-build b/kpatch-build/kpatch-build
+index daa9a81..a822708 100755
+--- a/kpatch-build/kpatch-build
++++ b/kpatch-build/kpatch-build
+@@ -1011,9 +1011,9 @@ fi
+ # $TARGETS used as list, no quotes.
+ # shellcheck disable=SC2086
+ if [[ -z "$USERMODBUILDDIR" ]]; then
+-	make "${MAKEVARS[@]}" "-j$CPUS" $TARGETS 2>&1 | logger || die
++	KBUILD_MODPOST_WARN=1 make "${MAKEVARS[@]}" "-j$CPUS" $TARGETS 2>&1 | logger || die
+ else
+-	make "${MAKEVARS[@]}" -C "$USERMODBUILDDIR" M="$USERMODBUILDDIR" $USERMODFLAGS "-j$CPUS" $TARGETS 2>&1 | logger || die
++	KBUILD_MODPOST_WARN=1 make "${MAKEVARS[@]}" -C "$USERMODBUILDDIR" M="$USERMODBUILDDIR" $USERMODFLAGS "-j$CPUS" $TARGETS 2>&1 | logger || die
+ fi
+ 
+ # Save original module symvers
+@@ -1158,9 +1158,9 @@ for i in $FILES; do
+ 			remove_patches
+ 			cd "$BUILDDIR" || die
+ 			if [ -z "$USERMODBUILDDIR" ];then
+-				make "-j$CPUS" $TARGETS 2>&1 | logger || die
++				KBUILD_MODPOST_WARN=1 make "-j$CPUS" $TARGETS 2>&1 | logger || die
+ 			else
+-				make -C "$USERMODBUILDDIR" M="$USERMODBUILDDIR" $USERMODFLAGS "-j$CPUS" $TARGETS 2>&1 | logger || die
++				KBUILD_MODPOST_WARN=1 make -C "$USERMODBUILDDIR" M="$USERMODBUILDDIR" $USERMODFLAGS "-j$CPUS" $TARGETS 2>&1 | logger || die
+ 			fi
+ 			cp ${KOBJFILE} ${KOBJFILE_PATH}
+ 			apply_patches
+@@ -1275,7 +1275,7 @@ KPATCH_LDFLAGS="$KPATCH_LDFLAGS" \
+ CROSS_COMPILE="$CROSS_COMPILE"
+ save_env
+ 
+-make "${MAKEVARS[@]}" 2>&1 | logger || die
++KBUILD_MODPOST_WARN=1 make "${MAKEVARS[@]}" 2>&1 | logger || die
+ strip -g "$TEMPDIR/patch/$MODNAME.ko"
+ 
+ if [[ "$USE_KLP" -eq 1 ]]; then
+-- 
+2.33.0
+
