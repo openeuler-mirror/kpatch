@@ -1,7 +1,7 @@
 Name:           kpatch
 Epoch:          1
 Version:        0.9.5
-Release:        6
+Release:        7
 Summary:        A Linux dynamic kernel patching infrastructure
 
 License:        GPLv2
@@ -59,6 +59,7 @@ Patch0043:0043-kpatch-build-Remove-duplicate-functions.patch
 Patch0044:0044-lookup-skip-finding-local-symbols-for-object-with-no.patch
 Patch0045:0045-backport-create-diff-object-add-support-for-.return_sites-sec.patch
 Patch0046:0046-create-diff-object-ignore-entsize-change-of-.return_.patch
+Patch0047:0047-kpatch-Add-sw64-architecture.patch
 
 BuildRequires:  gcc elfutils-libelf-devel kernel-devel git
 Requires:       bc make gcc patch bison flex openssl-devel
@@ -119,6 +120,12 @@ popd
 %{_mandir}/man1/*.1.gz
 
 %changelog
+* Fri Oct 21 2022 wuzx<wuzx1226@qq.com> - 1:0.9.5-7
+- Type:feature
+- CVE:NA
+- SUG:NA
+- DESC:Add sw64 architecture
+
 * Mon Oct 17 2022 Bin Hu<hubin73@huawei.com> -1:0.9.5-6
 - Type:bugfix
 - ID:NA

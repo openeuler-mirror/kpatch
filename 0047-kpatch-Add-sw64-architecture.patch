@@ -1,0 +1,56 @@
+From 43810251bf722bc3650e021d2272aa97f676aef5 Mon Sep 17 00:00:00 2001
+From: wzx <wuzx1226@qq.com>
+Date: Sat, 22 Oct 2022 11:49:37 +0800
+Subject: [PATCH] Add sw64 architecture
+
+Signed-off-by: rpm-build <rpm-build>
+---
+ kpatch-build/Makefile             | 4 ++++
+ kpatch-build/create-diff-object.c | 2 +-
+ kpatch-build/kpatch-elf.c         | 2 +-
+ 3 files changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/kpatch-build/Makefile b/kpatch-build/Makefile
+index 423c32a..bf18d1c 100644
+--- a/kpatch-build/Makefile
++++ b/kpatch-build/Makefile
+@@ -18,6 +18,10 @@ else ifeq ($(ARCH),aarch64)
+ SOURCES += insn/insn.c insn/inat.c
+ INSN     = insn/insn.o insn/inat.o
+ insn/%.o: CFLAGS := $(filter-out -Wconversion, $(CFLAGS))
++else ifeq ($(ARCH),sw_64)
++SOURCES += insn/insn.c insn/inat.c
++INSN     = insn/insn.o insn/inat.o
++insn/%.o: CFLAGS := $(filter-out -Wconversion, $(CFLAGS))
+ else ifeq ($(ARCH),ppc64le)
+ SOURCES += gcc-plugins/ppc64le-plugin.c
+ PLUGIN   = gcc-plugins/ppc64le-plugin.so
+diff --git a/kpatch-build/create-diff-object.c b/kpatch-build/create-diff-object.c
+index 6f3937f..f6f81f1 100644
+--- a/kpatch-build/create-diff-object.c
++++ b/kpatch-build/create-diff-object.c
+@@ -1688,7 +1688,7 @@ static void kpatch_replace_sections_syms(struct kpatch_elf *kelf)
+ 				continue;
+ 			}
+ 
+-#if defined(__powerpc64__) || defined(__aarch64__)
++#if defined(__powerpc64__) || defined(__aarch64__) || defined(__sw_64__)
+ 			add_off = 0;
+ #else
+ 			if (rela->type == R_X86_64_PC32 ||
+diff --git a/kpatch-build/kpatch-elf.c b/kpatch-build/kpatch-elf.c
+index c84d865..9e30922 100644
+--- a/kpatch-build/kpatch-elf.c
++++ b/kpatch-build/kpatch-elf.c
+@@ -325,7 +325,7 @@ static void kpatch_find_func_profiling_calls(struct kpatch_elf *kelf)
+ 	list_for_each_entry(sym, &kelf->symbols, list) {
+ 		if (sym->type != STT_FUNC || !sym->sec || !sym->sec->rela)
+ 			continue;
+-#if defined(__powerpc64__)
++#if defined(__powerpc64__) || defined(__sw_64__)
+ 		list_for_each_entry(rela, &sym->sec->rela->relas, list) {
+ 			if (!strcmp(rela->sym->name, "_mcount")) {
+ 				sym->has_func_profiling = 1;
+-- 
+2.33.0
+
