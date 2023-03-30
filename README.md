@@ -22,7 +22,7 @@ https://github.com/dynup/kpatch
 安装依赖软件包
 
 ```bash
-yum install -y make gcc patch bison flex openssl-devel kpatch kpatch-runtime
+yum install -y make gcc patch bison flex openssl-devel kpatch kpatch-runtime elfutils-libelf-devel
 ```
 
 安装当前内核源码和开发包
