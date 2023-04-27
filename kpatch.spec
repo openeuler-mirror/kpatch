@@ -1,7 +1,7 @@
 Name:           kpatch
 Epoch:          1
 Version:        0.9.7
-Release:        1
+Release:        2
 Summary:        A Linux dynamic kernel patching infrastructure
 
 License:        GPLv2
@@ -50,6 +50,7 @@ Patch0034:0034-create-diff-object-allow-__jump_table-section-change.patch
 Patch0035:0035-livepatch-patch-hook-fix-kpatch-build-error-which-do.patch
 Patch0036:0036-lookup-skip-finding-local-symbols-for-object-with-no.patch
 Patch0037:0037-create-diff-object-ignore-entsize-change-of-.return_.patch
+Patch0038:0038-fix-cc-remove-incorrect-CFLAGS.patch
 
 BuildRequires:  gcc elfutils-libelf-devel kernel-devel git
 Requires:       bc make gcc patch bison flex openssl-devel
@@ -110,6 +111,9 @@ popd
 %{_mandir}/man1/*.1.gz
 
 %changelog
+* Sun Apr 16 2023 Xiaoya Huang <huangxiaoya@iscas.ac.cn> - 1:0.9.7-2
+- Fix CC compiler support and CFLAGS error
+
 * Mon Jan 30 2023 Bin Hu <hubin73@huawei.com> -1:0.9.7-1
 - Type:enhancement
 - ID:NA

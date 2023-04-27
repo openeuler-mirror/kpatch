@@ -1,0 +1,21 @@
+--- a/kpatch-build/Makefile	2022-09-26 23:48:50.000000000 +0800
++++ b/kpatch-build/Makefile	2023-04-27 16:54:09.948999717 +0800
+@@ -1,7 +1,7 @@
+ include ../Makefile.inc
+ 
+ CFLAGS += -MMD -MP -I../kmod/patch -Iinsn -Wall -Wsign-compare \
+-	  -Wconversion -Wno-sign-conversion -g -Werror
++	  -Wconversion -Wno-sign-conversion -g
+ LDLIBS = -lelf
+ 
+ TARGETS = create-diff-object create-klp-module create-kpatch-module
+
+--- a/Makefile.inc	2022-09-26 23:48:50.000000000 +0800
++++ b/Makefile.inc	2023-04-27 16:53:42.890699993 +0800
+@@ -1,5 +1,5 @@
+ SHELL = /bin/sh
+-CC    = gcc
++CC   ?= gcc
+ 
+ INSTALL = /usr/bin/install
+ 
